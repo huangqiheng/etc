@@ -4,10 +4,8 @@ THIS_DIR=`dirname $(readlink -f $0)`
 
 main() 
 {
-	[ "$1" = "update" ] && git_update
+	[ "$1" = "update" ] && git_update_exit
 
-	echo 'ok'
-	exit
 	check_update
 
 	if ! cmd_exists /usr/bin/node; then
@@ -35,7 +33,7 @@ main()
 #		basic functions
 #-------------------------------------------------------
 
-git_update()
+git_update_exit()
 {
 	. $THIS_DIR/config.sh
 

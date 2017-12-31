@@ -1,3 +1,9 @@
+*.swp
+*.swo
+config.sh
+temp/
+\'
+
 # Logs
 logs
 *.log
