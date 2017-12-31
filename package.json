@@ -1,0 +1,33 @@
+{
+  "name": "etc",
+  "version": "1.0.0",
+  "description": "just sample code, not for produce",
+  "main": "index.js",
+  "dependencies": {
+    "config": "^1.29.0",
+    "express": "^4.16.2",
+    "minimist": "^1.2.0",
+    "node-cache": "^4.1.1",
+    "node-machine-id": "^1.1.9",
+    "uuid": "^3.1.0",
+    "ws": "^3.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://huangqiheng@github.com/huangqiheng/etc.git"
+  },
+  "keywords": [
+    "demo",
+    "test"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huangqiheng/etc/issues"
+  },
+  "homepage": "https://github.com/huangqiheng/etc#readme"
+}

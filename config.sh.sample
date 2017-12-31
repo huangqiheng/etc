@@ -4,3 +4,4 @@ GIT_USER_EMAIL=yourname@email.com
 GIT_PUSH_DEFAULT=simple
 GIT_PUSH_USER=your_github_username
 
+ECRYPTFS_PASS=yourpassword

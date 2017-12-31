@@ -4,10 +4,6 @@ THIS_DIR=`dirname $(readlink -f $0)`
 
 main() 
 {
-	[ "$1" = "update" ] && git_update_exit
-
-	check_update
-
 	if ! cmd_exists /usr/bin/node; then
 		log "installing nodejs"
 		curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
@@ -28,10 +24,53 @@ main()
 	npm install
 }
 
-
 #-------------------------------------------------------
 #		basic functions
 #-------------------------------------------------------
+
+maintain()
+{
+	[ "$1" = "update" ] && git_update_exit
+	[ "$1" = "checkout" ] && checkout_target_exit $2
+
+	check_update
+}
+
+checkout_target_exit()
+{
+	. $THIS_DIR/config.sh
+
+	local codesName=$1
+
+	if [ "$codesName" = "" ]; then
+		echo 'Please input source dirname to checkout'
+		exit 1
+	fi	
+
+	local source_dir=$THIS_DIR/$codesName
+	local checkout_dir=$THIS_DIR/public
+
+	if [ ! -d "$source_dir" ]; then
+		echo 'The input is invalid: '$source_dir
+		exit 1
+	fi	
+
+	check_apt ecryptfs-utils 
+
+	local options="no_sig_cache,ecryptfs_cipher=aes,ecryptfs_key_bytes=32,ecryptfs_passthrough=no,ecryptfs_enable_filename_crypto=yes"
+
+	if test $ECRYPTFS_PASS; then
+		options="$options,key=passphrase:passphrase_passwd=$ECRYPTFS_PASS"
+	fi
+
+	echo $options
+	echo "source: $source_dir"
+	echo "checkout: $checkout_dir"
+
+	umount $checkout_dir
+	mount -t ecryptfs -o $options $source_dir $checkout_dir
+	exit 0
+}
 
 git_update_exit()
 {
@@ -126,4 +165,5 @@ cmd_exists()
     type "$1" > /dev/null 2>&1
 }
 
+maintain "$@"
 main "$@"; exit $?

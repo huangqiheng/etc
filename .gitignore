@@ -2,6 +2,7 @@
 *.swo
 config.sh
 temp/
+public/
 \'
 
 # Logs
