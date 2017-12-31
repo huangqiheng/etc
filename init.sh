@@ -32,13 +32,34 @@ maintain()
 {
 	[ "$1" = "update" ] && git_update_exit
 	[ "$1" = "checkout" ] && checkout_target_exit $2
+	[ "$1" = "kill" ] && kill_exit
+	[ "$1" = "run" ] && run_exit
 
 	check_update
 }
 
+kill_exit()
+{
+	local pids=$(ps aux | grep '[n]ode main.js' | awk '{print $2}')
+	test $pids && kill $pids
+	exit 0
+}
+
+run_exit()
+{
+	cd $THIS_DIR/public
+	node main.js 
+	exit 0
+}
+
+include_config()
+{
+	[ -f $THIS_DIR/config.sh ] &&  . $THIS_DIR/config.sh
+}
+
 checkout_target_exit()
 {
-	. $THIS_DIR/config.sh
+	include_config
 
 	local codesName=$1
 
@@ -75,7 +96,7 @@ checkout_target_exit()
 
 git_update_exit()
 {
-	. $THIS_DIR/config.sh
+	include_config
 
 	local user=$(git config --global --get user.name)
 	[ -z $user ] && git config --global --add user.name $GIT_USER_NAME
