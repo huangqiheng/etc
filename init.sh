@@ -49,6 +49,7 @@ checkout_target_exit()
 
 	local source_dir=$THIS_DIR/$codesName
 	local checkout_dir=$THIS_DIR/public
+	mkdir -p $checkout_dir 
 
 	if [ ! -d "$source_dir" ]; then
 		echo 'The input is invalid: '$source_dir
