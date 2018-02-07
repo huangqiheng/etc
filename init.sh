@@ -36,10 +36,13 @@ help()
 ---------------------------------------------------
   Now you can:
 
-  (1) start the server: 
+  (1) First checkout the code: 
+	sh init.sh checkout ACode 
+
+  (2) Then start the server: 
 	sh init.sh run
 
-  (2) And stop the server: 
+  (3) Or stop the server: 
 	sh init.sh kill
 ---------------------------------------------------
 EOL
