@@ -15,18 +15,36 @@ main()
 		check_apt npm
 	fi
 
-	if ! cmd_exists /usr/bin/uglifyjs; then
+	if ! cmd_exists uglifyjs; then
 		npm install uglify-js -g
 	fi
 
 	cd $THIS_DIR
 
 	npm install
+
+	help
 }
 
 #-------------------------------------------------------
 #		basic functions
 #-------------------------------------------------------
+
+help()
+{
+	cat << EOL
+---------------------------------------------------
+  Now you can:
+
+  (1) start the server: 
+	sh init.sh run
+
+  (2) And stop the server: 
+	sh init.sh kill
+---------------------------------------------------
+EOL
+	echo $help
+}
 
 maintain()
 {
@@ -94,23 +112,39 @@ checkout_target_exit()
 	exit 0
 }
 
+check_git()
+{
+	local key="$1"
+	local defautVal="$2"
+	local value=$(git config --global --get ${key})
+
+	if [ -z "$value" ]; then
+		if [ -z $defautVal ]; then
+			read -p "Please input git config of \"${key}\": " GIT_CONFIG_INPUT
+		else
+			GIT_CONFIG_INPUT=$defautVal
+		fi
+
+		if [ -z "$GIT_CONFIG_INPUT" ]; then
+			echo "The input value is empty, exit"
+			exit 1;
+		fi
+		git config --global --add ${key} ${GIT_CONFIG_INPUT}
+	fi
+}
+
 git_update_exit()
 {
-	include_config
-
-	local user=$(git config --global --get user.name)
-	[ -z $user ] && git config --global --add user.name $GIT_USER_NAME
-
-	local email=$(git config --global --get user.email)
-	[ -z $email ] && git config --global --add user.email $GIT_USER_EMAIL
-
-	local push=$(git config --global --get push.default)
-	[ -z $push ] && git config --global --add push.default $GIT_PUSH_DEFAULT
+	check_git user.name 
+	check_git user.email
+	check_git push.default simple
+	check_git user.githubUserName 
 
 	local push_url=$(git remote get-url --push origin)
+	local githubUserName=$(git config --global --get user.githubUserName)
 
-	if ! echo $push_url | grep -q "${GIT_PUSH_USER}@"; then
-		local new_url=$(echo $push_url | sed -e "s/\/\//\/\/${GIT_PUSH_USER}@/g")
+	if ! echo $push_url | grep -q "${githubUserName}@"; then
+		local new_url=$(echo $push_url | sed -e "s/\/\//\/\/${githubUserName}@/g")
 		git remote set-url origin $new_url
 		echo "update remote url: $new_url"
 	fi
@@ -125,6 +159,7 @@ git_update_exit()
 
 	exit 0
 }
+
 
 check_update()
 {
