@@ -4,24 +4,26 @@ THIS_DIR=`dirname $(readlink -f $0)`
 
 main() 
 {
-	if ! cmd_exists /usr/bin/node; then
-		log "installing nodejs"
-		curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-		check_apt nodejs
+	if [ -f package.json ]; then
+		if ! cmd_exists /usr/bin/node; then
+			log "installing nodejs"
+			curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+			check_apt nodejs
+		fi
+
+		if ! cmd_exists /usr/bin/npm; then
+			log "installing npm"
+			check_apt npm
+		fi
+
+		if ! cmd_exists uglifyjs; then
+			npm install uglify-js -g
+		fi
+
+		cd $THIS_DIR
+
+		npm install
 	fi
-
-	if ! cmd_exists /usr/bin/npm; then
-		log "installing npm"
-		check_apt npm
-	fi
-
-	if ! cmd_exists uglifyjs; then
-		npm install uglify-js -g
-	fi
-
-	cd $THIS_DIR
-
-	npm install
 
 	help
 }
@@ -69,8 +71,16 @@ kill_exit()
 run_exit()
 {
 	cd $THIS_DIR/public
-	node main.js 
-	exit 0
+
+	if [ -f main.js ]; then
+		node main.js 
+		exit 0
+	fi
+
+	if [ -f index.js ]; then
+		node index.js 
+		exit 0
+	fi
 }
 
 include_config()
@@ -91,6 +101,7 @@ checkout_target_exit()
 
 	local source_dir=$THIS_DIR/$codesName
 	local checkout_dir=$THIS_DIR/public
+	mkdir -p $source_dir
 	mkdir -p $checkout_dir 
 
 	if [ ! -d "$source_dir" ]; then
