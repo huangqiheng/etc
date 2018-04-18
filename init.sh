@@ -46,6 +46,9 @@ help()
 
   (3) Or stop the server: 
 	sh init.sh kill
+
+  (4) Final close the mounted content: 
+	sh init.sh close
 ---------------------------------------------------
 EOL
 	echo $help
@@ -55,6 +58,7 @@ maintain()
 {
 	[ "$1" = "update" ] && git_update_exit
 	[ "$1" = "checkout" ] && checkout_target_exit $2
+	[ "$1" = "close" ] && umount_target_exit
 	[ "$1" = "kill" ] && kill_exit
 	[ "$1" = "run" ] && run_exit
 
@@ -88,6 +92,13 @@ include_config()
 	[ -f $THIS_DIR/config.sh ] &&  . $THIS_DIR/config.sh
 }
 
+umount_target_exit()
+{
+	local checkout_dir=$THIS_DIR/public
+	umount $checkout_dir
+	exit 0
+}
+
 checkout_target_exit()
 {
 	include_config
@@ -115,6 +126,14 @@ checkout_target_exit()
 
 	if test $ECRYPTFS_PASS; then
 		options="$options,key=passphrase:passphrase_passwd=$ECRYPTFS_PASS"
+	else
+		read -r -p "Please input PASSWORD: " inputpass <&2
+		if test $inputpass; then
+			options="$options,key=passphrase:passphrase_passwd=$inputpass"
+		else
+			echo "Error exit, password must be set."
+			exit 1
+		fi
 	fi
 
 	echo $options
@@ -122,7 +141,7 @@ checkout_target_exit()
 	echo "checkout: $checkout_dir"
 
 	umount $checkout_dir
-	mount -t ecryptfs -o $options $source_dir $checkout_dir
+	yes "" | mount -t ecryptfs -o $options $source_dir $checkout_dir
 	exit 0
 }
 
